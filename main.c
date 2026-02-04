@@ -1,41 +1,93 @@
+
 #include <stdlib.h>
 #include "raylib.h"
-#include <time.h> 
 #include <stdio.h> 
 
 #define TO_SECS 60 
-#define WIDTH 200
-#define HEIGHT 100
+#define WIDTH 2000
+#define HEIGHT 1000
+#define NUM_FRAMES 60
+
 int main(int argc, char* argv[])
 {
-  
-  InitWindow(WIDTH, HEIGHT, "Timer- Lock in! ");
-  int TIME_SCHEDULED_MIN= 30; // minutes  
+    InitWindow(WIDTH, HEIGHT, "Timer- Lock in! ");
+    InitAudioDevice();      // Initialize audio device
 
-  if(argc > 1){
-    TIME_SCHEDULED_MIN= atoi(argv[1]);
-  }
-  printf("%i",TIME_SCHEDULED_MIN);
-  const double TIME_SCHEDULED_SEC = (double)TIME_SCHEDULED_MIN * TO_SECS; 
+    Sound fxButton = LoadSound("buttonfx.wav");   // Load button sound
+    Texture2D button = LoadTexture("button.png"); // Load button texture
 
-  clock_t start = clock();
+    float frameHeight = (float)button.height / NUM_FRAMES;
+    Rectangle sourceRec = { 0, 0, (float)button.width, frameHeight };
 
-  char text[64];
+    Rectangle btnBounds = {
+        WIDTH / 2.0f - button.width / 2.0f,
+        HEIGHT / 2.0f - frameHeight / 2.0f,
+        (float)button.width,
+        frameHeight
+    };
 
-  while (!WindowShouldClose())
-  {
-      double elapsed = (double)(clock() - start) / CLOCKS_PER_SEC;
-      double remaining = TIME_SCHEDULED_SEC- elapsed;
+    int btnState = 0;
+    Vector2 mousePoint = { 0.0f, 0.0f };
 
-      if (remaining < 0) remaining = 0;
+    SetTargetFPS(60);
 
-      snprintf(text, sizeof(text), "Time left: %.0f s", remaining);
+    int TIME_SCHEDULED_MIN = 30;
+    if (argc > 1) TIME_SCHEDULED_MIN = atoi(argv[1]);
 
-      BeginDrawing();
-          ClearBackground(RAYWHITE);
-          DrawText(text, (WIDTH / 2) -75, (HEIGHT/2), 20, BLACK);
-      EndDrawing();
-  }
+    const double TIME_SCHEDULED_SEC = (double)TIME_SCHEDULED_MIN * TO_SECS;
 
-  return 0;
+    double startTime = GetTime();
+    double pausedElapsed = 0.0;
+    bool pause = false;
+
+    char text[64];
+
+    while (!WindowShouldClose())
+    {
+        mousePoint = GetMousePosition();
+
+        if (CheckCollisionPointRec(mousePoint, btnBounds))
+        {
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                PlaySound(fxButton);
+                pause = !pause;
+
+                if (pause)
+                {
+                    pausedElapsed = GetTime() - startTime;
+                    btnState = 2;
+                }
+                else
+                {
+                    startTime = GetTime() - pausedElapsed;
+                    btnState = 0;
+                }
+            }
+        }
+
+        sourceRec.y = btnState * frameHeight;
+
+        double elapsed = pause
+            ? pausedElapsed
+            : GetTime() - startTime;
+
+        double remaining = TIME_SCHEDULED_SEC - elapsed;
+        if (remaining < 0) remaining = 0;
+
+        snprintf(text, sizeof(text), "Time left: %.0f s", remaining);
+
+        BeginDrawing();
+            ClearBackground(RAYWHITE);
+            DrawText(text, WIDTH / 2 - 75, HEIGHT / 2, 20, BLACK);
+            DrawTextureRec(button, sourceRec, (Vector2){ btnBounds.x, btnBounds.y }, WHITE);
+        EndDrawing();
+    }
+
+    UnloadTexture(button);
+    UnloadSound(fxButton);
+    CloseAudioDevice();
+    CloseWindow();
+
+    return 0;
 }
