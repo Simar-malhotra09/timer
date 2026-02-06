@@ -37,9 +37,9 @@ int main(int argc, char* argv[])
     InitAudioDevice();
     Sound fxButton = LoadSound("buttonfx.wav");
     
-    Button button = button_new("osaka_sticker.jpeg", (Vector2){WIDTH - 100, HEIGHT - 50}, 0.05f);
+    Button button = button_new("osaka_sticker_re.jpeg", (Vector2){WIDTH - 100, HEIGHT - 50}, 0.25f);
     
-    float frameHeight = (float)button.height / NUM_FRAMES;
+    float frameHeight = (float)button.height / 1;
     Rectangle sourceRec = { 0, 0, (float)button.width, frameHeight };
     Rectangle btnBounds = {
         button.position.x - button.width ,   
