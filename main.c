@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "statusbar.h"
+
 #define TO_SECS 60
 #define WIDTH 300
 #define HEIGHT 160
@@ -10,6 +12,8 @@
 int main(int argc, char *argv[]) {
   InitWindow(WIDTH, HEIGHT, "Time to Lock in!");
   InitAudioDevice();
+  StatusBarInit();
+  StatusBarSetImage("media/osaka_sticker_re.jpeg");
 
   Sound fxButton = LoadSound("media/buttonfx.wav");
   Sound fxFinished = LoadSound("media/sata-andagi.mp3");
@@ -83,7 +87,8 @@ int main(int argc, char *argv[]) {
     if (remaining <= 0) {
       remaining = 0;
       timerEnded = true;
-
+      system("osascript -e 'display notification \"Timer finished\" with title "
+             "\"Timer\"'");
       if (!finishedPlayed) {
         PlaySound(fxFinished);
         finishedPlayed = true;
@@ -92,6 +97,7 @@ int main(int argc, char *argv[]) {
 
     // Only update text while timer is running
     snprintf(text, sizeof(text), "Time left: %.0f s", remaining);
+    StatusBarUpdate(text);
 
     BeginDrawing();
     ClearBackground(RAYWHITE);
@@ -105,6 +111,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Clean up
+  StatusBarCleanup();
   UnloadTexture(pause_button);
   UnloadSound(fxButton);
   UnloadSound(fxFinished);
