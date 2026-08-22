@@ -3,21 +3,21 @@
 #include <stdlib.h>
 
 #define TO_SECS 60
-#define WIDTH 1000 / 3
-#define HEIGHT 500 / 3
+#define WIDTH 300
+#define HEIGHT 160
 #define NUM_FRAMES 3
 
 int main(int argc, char *argv[]) {
   InitWindow(WIDTH, HEIGHT, "Time to Lock in!");
   InitAudioDevice();
 
-  Sound fxButton = LoadSound("buttonfx.wav");
-  Sound fxFinished = LoadSound("sata-andagi.mp3");
+  Sound fxButton = LoadSound("media/buttonfx.wav");
+  Sound fxFinished = LoadSound("media/sata-andagi.mp3");
 
   bool timerEnded = false;
   bool finishedPlayed = false;
 
-  Texture2D pause_button = LoadTexture("osaka_sticker_re.jpeg");
+  Texture2D pause_button = LoadTexture("media/osaka_sticker_re.jpeg");
   pause_button.height = pause_button.height / 3;
   pause_button.width = pause_button.width / 3;
 
@@ -28,8 +28,8 @@ int main(int argc, char *argv[]) {
   printf("Frame height: %f\n", frameHeight);
 
   Rectangle sourceRec = {0, 0, (float)pause_button.width / 6, frameHeight};
-  Rectangle btnBounds = {WIDTH / 2 + WIDTH / 4, HEIGHT / 2, pause_button.width,
-                         pause_button.height};
+  Rectangle btnBounds = {(float)WIDTH / 2 + (float)WIDTH / 4, (float)HEIGHT / 2,
+                         pause_button.width, pause_button.height};
 
   int btnState = 0;
   Vector2 mousePoint = {0.0f, 0.0f};
@@ -37,9 +37,11 @@ int main(int argc, char *argv[]) {
 
   float TIME_SCHEDULED_MIN = 30;
   float TIME_TO_START = 0;
-  if (argc > 2) {
+  if (argc > 1) {
     TIME_SCHEDULED_MIN = atof(argv[1]);
-    TIME_TO_START = atof(argv[2]);
+    if (argc > 2) {
+      TIME_TO_START = atof(argv[2]);
+    }
   }
 
   const double TIME_SCHEDULED_SEC = (double)TIME_SCHEDULED_MIN * TO_SECS;
