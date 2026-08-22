@@ -1,0 +1,15 @@
+[
+  {
+    "file": "main.c",
+    "arguments": [
+      "gcc",
+      "-o",
+      "timer",
+      "main.c",
+      "-I/opt/homebrew/Cellar/raylib/5.5/include"
+    ],
+    "directory": "/Users/0saker/Desktop/code/timer",
+    "output": "timer"
+  }
+]
+
