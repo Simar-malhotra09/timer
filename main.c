@@ -4,7 +4,8 @@
 
 #include "statusbar.h"
 
-#define IM_IN_PUBLIC 0
+#define IM_IN_PUBLIC 1
+#define MAX_PLAY_AFTER_FINISHED 18000
 #define TO_SECS 60
 #define WIDTH 300
 #define HEIGHT 160
@@ -88,7 +89,7 @@ int main(int argc, char *argv[]) {
 
     double elapsed = pause ? pausedElapsed : GetTime() - startTime;
     double remaining = TIME_SCHEDULED_SEC - elapsed;
-
+    double finishedStartTime = 0;
     // Timer ended logic
     if (remaining <= 0) {
       remaining = 0;
@@ -96,8 +97,14 @@ int main(int argc, char *argv[]) {
       system("osascript -e 'display notification \"Timer finished\" with title "
              "\"Timer\"'");
       if (!finishedPlayed) {
+        finishedStartTime = GetTime();
         PlaySound(fxFinished);
         finishedPlayed = true;
+      }
+      if (finishedPlayed &&
+          (GetTime() - finishedStartTime) * 1000 >= MAX_PLAY_AFTER_FINISHED) {
+        CloseWindow();
+        return 0;
       }
     }
 
