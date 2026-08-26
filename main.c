@@ -4,6 +4,7 @@
 
 #include "statusbar.h"
 
+#define IM_IN_PUBLIC 0
 #define TO_SECS 60
 #define WIDTH 300
 #define HEIGHT 160
@@ -16,7 +17,12 @@ int main(int argc, char *argv[]) {
   StatusBarSetImage("media/osaka_sticker_re.jpeg");
 
   Sound fxButton = LoadSound("media/buttonfx.wav");
-  Sound fxFinished = LoadSound("media/sata-andagi.mp3");
+  Sound fxFinished;
+  if (IM_IN_PUBLIC) {
+    fxFinished = LoadSound("media/YiYi_opening.mp3");
+  } else {
+    fxFinished = LoadSound("media/sata-andagi.mp3");
+  }
 
   bool timerEnded = false;
   bool finishedPlayed = false;
